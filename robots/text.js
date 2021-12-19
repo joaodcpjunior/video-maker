@@ -1,10 +1,17 @@
 const wikipedia = require('wikipedia')
 const sentenceBoundaryDetection = require('sbd')
+const luisApiKey = require('../credentials/luis-nlu.json').apiKey
+const luisEndpoint = require('../credentials/luis-nlu.json').endpoint
+const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-analytics");
+
+
 
 async function robot(content) {
     await fetchContentFromWikipedia(content)
     sanitezedContent(content)
     breakContentIntoSentences(content)
+    limitMaximumSentences(content)
+    await fetchKeyWordsOfAllSentences(content)
 
     async function fetchContentFromWikipedia(content) {
         try {
@@ -52,6 +59,29 @@ async function robot(content) {
            }) 
         })
     }
-}
 
+    function limitMaximumSentences(content) {
+        content.sentences = content.sentences.slice(0, content.maximumSentences)
+    }
+
+    async function fetchLuisAndReturnKeywords(text){
+        const client = new TextAnalyticsClient(luisEndpoint, new AzureKeyCredential(luisApiKey));
+
+        const document = [ text ]
+
+        const keyPhraseResult = await client.extractKeyPhrases(document)
+
+        const keyPhrases = keyPhraseResult.at(0).keyPhrases
+        
+        return keyPhrases;
+    }
+
+    async function fetchKeyWordsOfAllSentences(content) {
+        for(const sentence of content.sentences) {
+            sentence.keywords = await fetchLuisAndReturnKeywords(sentence.text)
+        }
+    }
+    
+  
+}
 module.exports = robot

@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/joaodcpjunior/video-maker#readme",
   "dependencies": {
+    "@azure/ai-text-analytics": "^5.1.0",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.19",
     "wikipedia": "^1.1.6"
