@@ -4,14 +4,18 @@ const luisApiKey = require('../credentials/luis-nlu.json').apiKey
 const luisEndpoint = require('../credentials/luis-nlu.json').endpoint
 const { TextAnalyticsClient, AzureKeyCredential } = require("@azure/ai-text-analytics");
 
+const state = require('./state')
 
+async function robot() {
+    const content = state.load()
 
-async function robot(content) {
     await fetchContentFromWikipedia(content)
     sanitezedContent(content)
     breakContentIntoSentences(content)
     limitMaximumSentences(content)
     await fetchKeyWordsOfAllSentences(content)
+    
+    state.save(content)
 
     async function fetchContentFromWikipedia(content) {
         try {
