@@ -1,4 +1,5 @@
 const google = require('googleapis').google
+
 const customSearch = google.customsearch('v1')
 const state = require('./state.js')
 const imageDownloader = require('image-downloader')
@@ -11,6 +12,7 @@ async function robot() {
 
     await fetchImagesOfAllSentences(content)
     await downloadAllImages(content)
+    
 
     state.save(content)
 
@@ -71,6 +73,7 @@ async function robot() {
             dest: `./content/${fileName}`
         })
     }
+
 }
 
 module.exports = robot
